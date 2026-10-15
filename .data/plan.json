@@ -1,5 +1,5 @@
 {
-  "revision": 140,
+  "revision": 141,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -65,20 +65,7 @@
       "color": "blue",
       "reference": "",
       "notes": ""
-    },
-    {
-      "id": "party-item-mva6i9r1-md15b",
-      "name": "Game station",
-      "type": "Activity",
-      "widthFt": 5,
-      "depthFt": 5,
-      "x": 19.51065680730752,
-      "y": 0,
-      "rotation": -15,
-      "color": "yellow",
-      "reference": "",
-      "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:38:58.600Z"
+  "updatedAt": "2026-10-15T23:39:10.824Z"
 }
