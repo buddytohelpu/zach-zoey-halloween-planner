@@ -1,5 +1,5 @@
 {
-  "revision": 284,
+  "revision": 285,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -256,11 +256,11 @@
       "depthFt": 4,
       "x": 40.526315789473685,
       "y": 47.89473684210526,
-      "rotation": 0,
+      "rotation": 45,
       "color": "teal",
       "reference": "",
       "notes": "Leave room behind the table for serving."
     }
   ],
-  "updatedAt": "2026-10-15T23:48:33.660Z"
+  "updatedAt": "2026-10-15T23:48:42.558Z"
 }
