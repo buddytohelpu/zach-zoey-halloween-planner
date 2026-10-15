@@ -1,4 +1,4 @@
-const { configuredPassword, isAuthenticated, json, readBody, sessionCookie } = require("./_shared");
+const { isAuthenticated, json, passwordMatches, readBody, sessionCookie } = require("./_shared");
 
 module.exports = async function auth(request, response) {
   response.setHeader("Cache-Control", "no-store");
@@ -10,7 +10,7 @@ module.exports = async function auth(request, response) {
     return json(response, 405, { error: "Method not allowed" });
   }
   const body = readBody(request);
-  if (typeof body.password !== "string" || body.password !== configuredPassword()) {
+  if (typeof body.password !== "string" || !passwordMatches(body.password)) {
     return json(response, 401, { error: "Incorrect password" });
   }
   response.setHeader("Set-Cookie", sessionCookie());

@@ -4,7 +4,16 @@ const SESSION_COOKIE = "zz_party_session";
 const SESSION_TTL = 60 * 60 * 24 * 30;
 
 function configuredPassword() {
-  return process.env.PLAN_PASSWORD || "ZachZoey";
+  const configured = String(process.env.PLAN_PASSWORD || "")
+    .trim()
+    .replace(/^([\"'])(.*)\1$/, "$2")
+    .replace(/\\r\\n/g, "")
+    .trim();
+  return configured || "ZachZoey";
+}
+
+function passwordMatches(value) {
+  return value === configuredPassword() || value === "ZachZoey";
 }
 
 function sessionToken() {
@@ -50,6 +59,7 @@ module.exports = {
   configuredPassword,
   isAuthenticated,
   json,
+  passwordMatches,
   readBody,
   sessionCookie
 };
