@@ -1,5 +1,5 @@
 {
-  "revision": 247,
+  "revision": 248,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -211,7 +211,7 @@
     },
     {
       "id": "party-item-mva6sete-09ayz",
-      "name": "Skeleton Find Ha",
+      "name": "Skeleton Find Hay",
       "type": "Activity",
       "widthFt": 5,
       "depthFt": 5,
@@ -223,5 +223,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:46:03.905Z"
+  "updatedAt": "2026-10-15T23:46:05.095Z"
 }
