@@ -1,5 +1,5 @@
 {
-  "revision": 72,
+  "revision": 73,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -29,7 +29,7 @@
     },
     {
       "id": "party-item-mva53cc3-byi5r",
-      "name": "New setup",
+      "name": "New setup ",
       "type": "Other",
       "widthFt": 10,
       "depthFt": 10,
@@ -41,5 +41,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T22:58:02.354Z"
+  "updatedAt": "2026-10-15T22:58:03.886Z"
 }
