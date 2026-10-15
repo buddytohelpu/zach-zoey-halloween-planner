@@ -1,5 +1,5 @@
 {
-  "revision": 217,
+  "revision": 218,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -198,7 +198,7 @@
     },
     {
       "id": "party-item-mva6qy2a-g05yo",
-      "name": "Game 10 copy",
+      "name": "Game 10",
       "type": "Activity",
       "widthFt": 5,
       "depthFt": 5,
@@ -210,5 +210,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:44:42.322Z"
+  "updatedAt": "2026-10-15T23:44:47.743Z"
 }
