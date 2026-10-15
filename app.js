@@ -68,6 +68,9 @@
     remotePollTimer: null,
     remoteRevision: 0,
     remoteDirty: false,
+    localChangeSerial: 0,
+    isEditing: false,
+    syncPending: false,
     authenticated: false,
     authApiAvailable: false,
     remoteAvailable: false,
@@ -127,6 +130,7 @@
   }
 
   function persist() {
+    state.localChangeSerial += 1;
     window.clearTimeout(state.saveTimer);
     state.saveTimer = window.setTimeout(() => {
       try {
@@ -154,6 +158,7 @@
 
   async function saveRemotePlan(isRetry = false) {
     if (!state.authenticated || !state.authApiAvailable || !state.remoteDirty) return;
+    const saveSerial = state.localChangeSerial;
     try {
       const response = await fetch(PLAN_ENDPOINT, {
         method: "PUT",
@@ -164,9 +169,10 @@
       if (response.status === 409) {
         const conflict = await response.json();
         const localItems = state.items;
+        const selectedId = state.selectedId;
         state.items = mergeItems(conflict.items || [], localItems).map(normalizeItem);
         state.remoteRevision = Number(conflict.revision || 0);
-        state.selectedId = state.items[0]?.id || null;
+        state.selectedId = state.items.some((item) => item.id === selectedId) ? selectedId : state.items[0]?.id || null;
         state.remoteDirty = true;
         renderAll();
         if (!isRetry) return saveRemotePlan(true);
@@ -175,7 +181,14 @@
       if (!response.ok) throw new Error(`Shared save failed (${response.status})`);
       const payload = await response.json();
       state.remoteRevision = Number(payload.revision || state.remoteRevision + 1);
+      if (state.localChangeSerial !== saveSerial) {
+        state.remoteDirty = true;
+        setSavedStatus("Saving shared plan…", "cloud-upload");
+        queueRemoteSave();
+        return;
+      }
       state.remoteDirty = false;
+      state.syncPending = false;
       setSavedStatus("Saved to shared plan", "cloud");
     } catch (error) {
       state.remoteAvailable = false;
@@ -192,12 +205,26 @@
 
   async function syncRemotePlan(options = {}) {
     if (!state.authenticated || !state.authApiAvailable || (state.remoteDirty && options.quiet)) return;
+    if (state.isEditing) {
+      state.syncPending = true;
+      return;
+    }
+    const requestSerial = state.localChangeSerial;
     try {
       const response = await fetch(PLAN_ENDPOINT, { credentials: "same-origin", cache: "no-store" });
       if (!response.ok) throw new Error(`Shared load failed (${response.status})`);
       const payload = await response.json();
       state.remoteAvailable = true;
       state.remoteRevision = Number(payload.revision || 0);
+      if (state.isEditing || state.localChangeSerial !== requestSerial) {
+        state.syncPending = true;
+        if (state.localChangeSerial !== requestSerial) {
+          state.remoteDirty = true;
+          setSavedStatus("Saving shared plan…", "cloud-upload");
+          queueRemoteSave();
+        }
+        return;
+      }
       if (Array.isArray(payload.items)) {
         const selectedId = state.selectedId;
         state.items = payload.items.map(normalizeItem);
@@ -206,6 +233,7 @@
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, items: state.items })); } catch (error) { /* local fallback is optional */ }
         renderAll();
         setSavedStatus("Saved to shared plan", "cloud");
+        state.syncPending = false;
       } else {
         state.remoteDirty = true;
         setSavedStatus("Preparing shared plan…", "cloud-upload");
@@ -929,6 +957,17 @@
   els.itemForm.addEventListener("change", (event) => {
     const field = event.target.closest("[data-field]");
     if (field) updateItem(field.dataset.field, field.value);
+  });
+  els.itemForm.addEventListener("focusin", () => {
+    state.isEditing = true;
+  });
+  els.itemForm.addEventListener("focusout", (event) => {
+    if (event.relatedTarget && els.itemForm.contains(event.relatedTarget)) return;
+    state.isEditing = false;
+    if (state.syncPending) {
+      state.syncPending = false;
+      syncRemotePlan({ quiet: true });
+    }
   });
   els.itemForm.querySelector(".swatches").addEventListener("click", (event) => {
     const swatch = event.target.closest(".swatch");
