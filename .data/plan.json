@@ -1,9 +1,9 @@
 {
-  "revision": 274,
+  "revision": 275,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
-      "name": "Bounce House",
+      "name": "Bounce House Bub",
       "type": "Other",
       "widthFt": 10,
       "depthFt": 10,
@@ -249,5 +249,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:47:42.647Z"
+  "updatedAt": "2026-10-15T23:47:43.840Z"
 }
