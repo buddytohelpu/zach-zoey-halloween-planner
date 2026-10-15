@@ -35,7 +35,9 @@ function sessionCookie() {
 }
 
 function json(response, status, body) {
-  response.status(status).setHeader("Cache-Control", "no-store").json(body);
+  response.status(status);
+  response.setHeader("Cache-Control", "no-store");
+  return response.json(body);
 }
 
 function readBody(request) {
