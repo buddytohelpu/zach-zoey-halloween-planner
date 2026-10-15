@@ -13,7 +13,8 @@ function configuredPassword() {
 }
 
 function passwordMatches(value) {
-  return value === configuredPassword() || value === "ZachZoey";
+  const candidate = String(value || "").trim();
+  return candidate === configuredPassword() || candidate === "ZachZoey";
 }
 
 function sessionToken() {
