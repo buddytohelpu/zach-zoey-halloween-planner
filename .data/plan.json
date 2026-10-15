@@ -1,19 +1,5 @@
 {
-  "revision": 4,
-  "items": [
-    {
-      "id": "verification-item",
-      "name": "Verification item",
-      "type": "Other",
-      "widthFt": 6,
-      "depthFt": 6,
-      "x": 50,
-      "y": 50,
-      "rotation": 30,
-      "color": "blue",
-      "reference": "temporary",
-      "notes": "temporary"
-    }
-  ],
-  "updatedAt": "2026-10-15T20:53:28.439Z"
+  "revision": 5,
+  "items": [],
+  "updatedAt": "2026-10-15T20:53:29.854Z"
 }
