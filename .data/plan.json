@@ -1,5 +1,5 @@
 {
-  "revision": 158,
+  "revision": 159,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -143,7 +143,20 @@
       "color": "yellow",
       "reference": "",
       "notes": ""
+    },
+    {
+      "id": "party-item-mva6na26-vvd2p",
+      "name": "Game station copy copy copy copy copy co",
+      "type": "Activity",
+      "widthFt": 5,
+      "depthFt": 5,
+      "x": 19.50797750229568,
+      "y": 30.462340208303104,
+      "rotation": -15,
+      "color": "yellow",
+      "reference": "",
+      "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:41:29.360Z"
+  "updatedAt": "2026-10-15T23:41:30.670Z"
 }
