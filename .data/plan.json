@@ -1,19 +1,5 @@
 {
-  "revision": 2,
-  "items": [
-    {
-      "id": "test-table",
-      "name": "Test table",
-      "type": "Seating",
-      "widthFt": 8,
-      "depthFt": 4,
-      "x": 40,
-      "y": 45,
-      "rotation": 15,
-      "color": "teal",
-      "reference": "Verification",
-      "notes": "Temporary API check"
-    }
-  ],
-  "updatedAt": "2026-10-15T20:43:03.135Z"
+  "revision": 3,
+  "items": [],
+  "updatedAt": "2026-10-15T20:49:52.141Z"
 }
