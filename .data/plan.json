@@ -1,5 +1,5 @@
 {
-  "revision": 186,
+  "revision": 187,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -146,7 +146,7 @@
     },
     {
       "id": "party-item-mva6ndu3-0rn2h",
-      "name": "Game 6",
+      "name": "Game 7",
       "type": "Activity",
       "widthFt": 5,
       "depthFt": 5,
@@ -158,5 +158,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:43:02.767Z"
+  "updatedAt": "2026-10-15T23:43:06.886Z"
 }
