@@ -1,5 +1,5 @@
 {
-  "revision": 145,
+  "revision": 146,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -85,13 +85,26 @@
       "type": "Activity",
       "widthFt": 5,
       "depthFt": 5,
-      "x": 19.83436639118456,
+      "x": 19.573949724517902,
       "y": 53.18456243052536,
       "rotation": -15,
       "color": "yellow",
       "reference": "",
       "notes": ""
+    },
+    {
+      "id": "party-item-mva6mf9a-2ll5v",
+      "name": "New setup copy",
+      "type": "Other",
+      "widthFt": 10,
+      "depthFt": 10,
+      "x": 59.67129961187234,
+      "y": 12.586915938319947,
+      "rotation": -15,
+      "color": "coral",
+      "reference": "",
+      "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:40:48.039Z"
+  "updatedAt": "2026-10-15T23:40:50.277Z"
 }
