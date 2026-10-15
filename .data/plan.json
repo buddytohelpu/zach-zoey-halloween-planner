@@ -1,5 +1,5 @@
 {
-  "revision": 44,
+  "revision": 45,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -29,7 +29,7 @@
     },
     {
       "id": "party-item-mva4jrux-8vgj2",
-      "name": "bAL",
+      "name": "N",
       "type": "Other",
       "widthFt": 10,
       "depthFt": 10,
@@ -41,5 +41,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T22:51:10.283Z"
+  "updatedAt": "2026-10-15T22:51:11.373Z"
 }
