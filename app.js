@@ -43,6 +43,7 @@
     listTotal: document.getElementById("listTotal"),
     inspectorTitle: document.getElementById("inspectorTitle"),
     inspectorNumber: document.getElementById("inspectorNumber"),
+    copyItemButton: document.getElementById("copyItemButton"),
     emptyInspector: document.getElementById("emptyInspector"),
     itemForm: document.getElementById("itemForm"),
     zoomRange: document.getElementById("zoomRange"),
@@ -111,6 +112,18 @@
     const number = Number(value);
     if (!Number.isFinite(number)) return fallback;
     return Math.min(max, Math.max(min, number));
+  }
+
+  function parseDimension(value) {
+    const raw = String(value ?? "").trim();
+    if (!raw) return null;
+    const number = Number(raw);
+    if (!Number.isFinite(number) || number < 1 || number > FRONTAGE_FT) return null;
+    return number;
+  }
+
+  function isDimensionKey(key) {
+    return key === "widthFt" || key === "depthFt";
   }
 
   function readSavedPlan() {
@@ -389,6 +402,7 @@
     els.inspectorTitle.textContent = hasItem ? item.name : "Add an item";
     els.inspectorNumber.textContent = hasItem ? item.number : "—";
     els.inspectorNumber.classList.toggle("muted", !hasItem);
+    els.copyItemButton.disabled = !hasItem;
     if (!hasItem) return;
     els.itemForm.querySelectorAll("[data-field]").forEach((field) => {
       const key = field.dataset.field;
@@ -452,11 +466,41 @@
     renderAll();
   }
 
-  function updateItem(key, value) {
+  function restoreDimensionField(key) {
+    const item = getSelected();
+    const field = els.itemForm.querySelector(`[data-field="${key}"]`);
+    if (item && field) field.value = item[key];
+  }
+
+  function commitDimensionField(field) {
+    if (!field || !isDimensionKey(field.dataset.field)) return;
+    const key = field.dataset.field;
+    if (parseDimension(field.value) === null) {
+      restoreDimensionField(key);
+      return;
+    }
+    updateItem(key, field.value, { commit: true });
+  }
+
+  function restoreIncompleteDimensions() {
+    ["widthFt", "depthFt"].forEach((key) => {
+      const field = els.itemForm.querySelector(`[data-field="${key}"]`);
+      if (field && parseDimension(field.value) === null) restoreDimensionField(key);
+    });
+  }
+
+  function updateItem(key, value, options = {}) {
     const item = getSelected();
     if (!item) return;
-    if (key === "widthFt" || key === "depthFt") {
-      const next = clampNumber(value, 1, FRONTAGE_FT, item[key]);
+    if (isDimensionKey(key)) {
+      const next = parseDimension(value);
+      // Number fields are intentionally allowed to be empty while a person
+      // replaces a size. Keep the last valid model value until a new number
+      // arrives, then restore it only if the field is left incomplete.
+      if (next === null) {
+        if (options.commit) restoreDimensionField(key);
+        return;
+      }
       if (key === "widthFt" && state.lockDimensions) {
         const ratio = item.depthFt / item.widthFt;
         item.widthFt = next;
@@ -483,11 +527,16 @@
     persist();
     renderMap();
     renderList();
-    if (key === "widthFt" || key === "depthFt") {
-      els.itemForm.querySelector('[data-field="widthFt"]').value = item.widthFt;
-      els.itemForm.querySelector('[data-field="depthFt"]').value = item.depthFt;
+    if (isDimensionKey(key)) {
+      // Keep the active field's text/caret intact while updating the linked
+      // dimension beside it.
+      if (key !== "widthFt") els.itemForm.querySelector('[data-field="widthFt"]').value = item.widthFt;
+      if (key !== "depthFt") els.itemForm.querySelector('[data-field="depthFt"]').value = item.depthFt;
     }
-    if (key === "rotation") els.itemForm.querySelector('[data-field="rotation"]').value = item.rotation;
+    if (key === "rotation") {
+      const rotationField = els.itemForm.querySelector('[data-field="rotation"]');
+      if (document.activeElement !== rotationField) rotationField.value = item.rotation;
+    }
     els.inspectorTitle.textContent = item.name;
     updateStatus();
   }
@@ -929,6 +978,7 @@
   document.getElementById("emptyAddButton").addEventListener("click", () => addItem());
   document.getElementById("deleteButton").addEventListener("click", deleteSelected);
   document.getElementById("duplicateButton").addEventListener("click", duplicateSelected);
+  els.copyItemButton.addEventListener("click", duplicateSelected);
   document.getElementById("resetButton").addEventListener("click", resetPlan);
   document.getElementById("exportButton").addEventListener("click", exportPlan);
   document.getElementById("importButton").addEventListener("click", () => document.getElementById("importInput").click());
@@ -956,13 +1006,17 @@
   });
   els.itemForm.addEventListener("change", (event) => {
     const field = event.target.closest("[data-field]");
-    if (field) updateItem(field.dataset.field, field.value);
+    if (field && !isDimensionKey(field.dataset.field)) updateItem(field.dataset.field, field.value);
   });
   els.itemForm.addEventListener("focusin", () => {
     state.isEditing = true;
   });
   els.itemForm.addEventListener("focusout", (event) => {
-    if (event.relatedTarget && els.itemForm.contains(event.relatedTarget)) return;
+    const field = event.target.closest?.("[data-field]");
+    const leavingForm = !event.relatedTarget || !els.itemForm.contains(event.relatedTarget);
+    if (leavingForm && field) commitDimensionField(field);
+    if (!leavingForm) return;
+    restoreIncompleteDimensions();
     state.isEditing = false;
     if (state.syncPending) {
       state.syncPending = false;

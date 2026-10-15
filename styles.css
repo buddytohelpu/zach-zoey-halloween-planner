@@ -278,6 +278,11 @@ h2 { margin: 0; font-size: 18px; line-height: 1.1; font-weight: 600; }
 .side-column { display: grid; gap: 16px; min-width: 0; }
 .inspector, .items-panel { overflow: hidden; }
 .inspector { min-height: 274px; }
+.inspector-heading-actions { display: flex; align-items: center; gap: 8px; }
+.inspector-copy { min-height: 34px; padding: 7px 9px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--line); border-radius: 5px; background: #edf3ef; color: var(--teal-dark); font-size: 11px; font-weight: 700; }
+.inspector-copy svg { width: 14px; height: 14px; }
+.inspector-copy:hover:not(:disabled) { border-color: #b9d0c7; background: #e3eee8; transform: translateY(-1px); }
+.inspector-copy:disabled { cursor: not-allowed; opacity: .45; }
 .number-badge { min-width: 29px; height: 29px; display: inline-grid; place-items: center; border-radius: 50%; background: var(--ink); color: #fff; font-family: "Space Grotesk", sans-serif; font-size: 13px; font-weight: 700; }
 .number-badge.muted { background: #ebefeb; color: #a0aaa4; }
 .empty-inspector { padding: 20px 18px 22px; border-top: 1px solid var(--line); color: var(--ink-soft); }
@@ -351,7 +356,7 @@ h2 { margin: 0; font-size: 18px; line-height: 1.1; font-weight: 600; }
   .workspace { grid-template-columns: 1fr; }
   .map-viewport { max-height: none; }
   .side-column { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
-  .button, .icon-button, .tool-button, .lock-button { min-height: 42px; }
+  .button, .icon-button, .tool-button, .lock-button, .inspector-copy { min-height: 42px; }
   .icon-button { width: 42px; }
   .lock-button { width: 42px; height: 42px; }
   .swatch { width: 32px; height: 32px; }
@@ -379,6 +384,7 @@ h2 { margin: 0; font-size: 18px; line-height: 1.1; font-weight: 600; }
   .field input, .field select, .field textarea { min-height: 42px; font-size: 16px; }
   .field textarea { min-height: 88px; }
   .item-form { padding-inline: 13px; }
+  .inspector-heading-actions { gap: 6px; }
   .item-card { min-height: 58px; padding-block: 14px; }
   .toast { right: max(12px, env(safe-area-inset-right)); bottom: max(12px, env(safe-area-inset-bottom)); }
 }

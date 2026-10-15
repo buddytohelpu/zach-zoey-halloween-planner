@@ -85,7 +85,7 @@
             </div>
           </div>
           <div class="map-footer">
-            <div class="scale-key"><span class="scale-line"></span><span>95 ft frontage reference</span><span class="separator">·</span><span id="scaleDetail">1 ft ≈ 1.05% map width</span><span class="gesture-hint">Pinch to zoom · twist a selected box to rotate</span></div>
+            <div class="scale-key"><span class="scale-line"></span><span>95 ft frontage reference</span><span class="separator">·</span><span id="scaleDetail">1 ft ≈ 1.05% map width</span><span class="gesture-hint">Tap to select · drag to move · pinch to zoom · twist to rotate</span></div>
             <div class="map-count" id="mapCount">0 items</div>
           </div>
         </section>
@@ -97,7 +97,10 @@
                 <p class="section-kicker">Selected marker</p>
                 <h2 id="inspectorTitle">Add an item</h2>
               </div>
-              <span class="number-badge muted" id="inspectorNumber">—</span>
+              <div class="inspector-heading-actions">
+                <button class="inspector-copy" id="copyItemButton" type="button" title="Copy selected item" aria-label="Copy selected item" disabled><i data-lucide="copy" aria-hidden="true"></i><span>Copy</span></button>
+                <span class="number-badge muted" id="inspectorNumber">—</span>
+              </div>
             </div>
             <div class="empty-inspector" id="emptyInspector">
               <div class="empty-icon"><i data-lucide="map-pin-plus" aria-hidden="true"></i></div>
@@ -111,9 +114,9 @@
               </div>
               <div class="dimensions-heading"><span>Footprint</span><small>Set in feet</small></div>
               <div class="field-row dimensions-row">
-                <label class="field"><span>Width</span><div class="unit-input"><input type="number" data-field="widthFt" min="1" max="95" step="0.5"><em>ft</em></div></label>
+                <label class="field"><span>Width</span><div class="unit-input"><input type="number" data-field="widthFt" inputmode="decimal" min="1" max="95" step="0.5"><em>ft</em></div></label>
                 <span class="dimension-x">×</span>
-                <label class="field"><span>Depth</span><div class="unit-input"><input type="number" data-field="depthFt" min="1" max="95" step="0.5"><em>ft</em></div></label>
+                <label class="field"><span>Depth</span><div class="unit-input"><input type="number" data-field="depthFt" inputmode="decimal" min="1" max="95" step="0.5"><em>ft</em></div></label>
                 <button class="lock-button is-locked" id="lockDimensions" type="button" title="Keep width and depth linked" aria-label="Keep width and depth linked"><i data-lucide="lock" aria-hidden="true"></i></button>
               </div>
               <div class="rotation-row">
@@ -134,7 +137,7 @@
               <label class="field"><span>Reference / owner</span><input type="text" data-field="reference" maxlength="50" placeholder="e.g. Aunt Jess · bring props"></label>
               <label class="field"><span>Notes</span><textarea data-field="notes" rows="3" maxlength="240" placeholder="Power, setup, supplies, or timing notes"></textarea></label>
               <div class="form-actions">
-                <button class="button button-dark" type="button" id="duplicateButton"><i data-lucide="copy" aria-hidden="true"></i>Duplicate</button>
+                <button class="button button-dark" type="button" id="duplicateButton"><i data-lucide="copy" aria-hidden="true"></i>Copy item</button>
                 <button class="button button-danger" type="button" id="deleteButton"><i data-lucide="trash-2" aria-hidden="true"></i>Delete</button>
               </div>
             </form>
@@ -159,7 +162,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=20261015-9"></script>
+  <script src="app.js?v=20261015-10"></script>
   <script async src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>
 </body>
 </html>
