@@ -226,7 +226,10 @@
         return;
       }
       state.authApiAvailable = true;
-      if (response.ok) unlockPlanner();
+      if (response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        if (payload.authenticated) unlockPlanner();
+      }
     } catch (error) {
       state.authApiAvailable = false;
     }

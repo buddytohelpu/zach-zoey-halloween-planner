@@ -3,7 +3,7 @@ const { isAuthenticated, json, passwordMatches, readBody, sessionCookie } = requ
 module.exports = async function auth(request, response) {
   response.setHeader("Cache-Control", "no-store");
   if (request.method === "GET") {
-    return json(response, isAuthenticated(request) ? 200 : 401, { authenticated: isAuthenticated(request) });
+    return json(response, 200, { authenticated: isAuthenticated(request) });
   }
   if (request.method !== "POST") {
     response.setHeader("Allow", "GET, POST");
