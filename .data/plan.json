@@ -1,5 +1,19 @@
 {
-  "revision": 5,
-  "items": [],
-  "updatedAt": "2026-10-15T20:53:29.854Z"
+  "revision": 6,
+  "items": [
+    {
+      "id": "party-item-mva40in4-elfz8",
+      "name": "New setup",
+      "type": "Other",
+      "widthFt": 10,
+      "depthFt": 10,
+      "x": 44.73684210526316,
+      "y": 44.73684210526316,
+      "rotation": 0,
+      "color": "blue",
+      "reference": "",
+      "notes": ""
+    }
+  ],
+  "updatedAt": "2026-10-15T22:27:47.763Z"
 }
