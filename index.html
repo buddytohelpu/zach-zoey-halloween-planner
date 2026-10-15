@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#162635">
+  <meta name="description" content="Interactive Zach and Zoey Halloween party yard planner.">
+  <title>Zach &amp; Zoey | Halloween Yard Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="auth-gate" id="authGate">
+    <div class="auth-card">
+      <div class="auth-mark" aria-hidden="true"><span>Z</span><span>&amp;</span><span>Z</span></div>
+      <p class="eyebrow">Private party plan</p>
+      <h1>Unlock the yard map</h1>
+      <p class="auth-copy">Use the shared party password to open Zach &amp; Zoey's planning board.</p>
+      <form id="authForm" class="auth-form">
+        <label class="field"><span>Party password</span><input id="passwordInput" type="password" autocomplete="current-password" autofocus required placeholder="Enter password"></label>
+        <button class="button button-dark auth-submit" type="submit"><i data-lucide="key-round" aria-hidden="true"></i><span>Unlock planner</span></button>
+        <p class="auth-error" id="authError" role="alert" hidden></p>
+      </form>
+      <p class="auth-footnote"><i data-lucide="shield-check" aria-hidden="true"></i>Shared updates are saved for the whole group.</p>
+    </div>
+  </div>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true"><span>Z</span><span>&amp;</span><span>Z</span></div>
+        <div>
+          <p class="eyebrow">October 31 · backyard plan</p>
+          <h1>Zach &amp; Zoey's Halloween Party</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <span class="saved-status" id="savedStatus"><i data-lucide="cloud-off" aria-hidden="true"></i>Waiting to sync</span>
+        <button class="icon-button" id="exportButton" type="button" title="Download plan backup" aria-label="Download plan backup"><i data-lucide="download" aria-hidden="true"></i></button>
+        <button class="icon-button" id="importButton" type="button" title="Load plan backup" aria-label="Load plan backup"><i data-lucide="upload" aria-hidden="true"></i></button>
+        <input id="importInput" type="file" accept="application/json" hidden>
+        <button class="button button-light" id="resetButton" type="button"><i data-lucide="rotate-ccw" aria-hidden="true"></i>Reset plan</button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="toolbar" aria-label="Plan tools">
+        <div class="tool-group">
+          <span class="tool-label">Place</span>
+          <button class="tool-button is-active" data-tool="select" type="button" title="Select and move items"><i data-lucide="mouse-pointer-2" aria-hidden="true"></i><span>Select</span></button>
+          <button class="tool-button" data-tool="draw" type="button" title="Draw a box to scale"><i data-lucide="square-dashed-mouse-pointer" aria-hidden="true"></i><span>Draw to scale</span></button>
+          <button class="tool-button" id="addItemButton" type="button" title="Add a new item"><i data-lucide="plus" aria-hidden="true"></i><span>Add item</span></button>
+        </div>
+        <div class="quick-add" aria-label="Quick add">
+          <span class="tool-label">Quick add</span>
+          <button class="quick-button" data-preset="bounce" type="button"><span class="quick-dot coral"></span>Bounce house</button>
+          <button class="quick-button" data-preset="game" type="button"><span class="quick-dot yellow"></span>Game</button>
+          <button class="quick-button" data-preset="table" type="button"><span class="quick-dot teal"></span>Table</button>
+          <button class="quick-button" data-preset="seating" type="button"><span class="quick-dot plum"></span>Seating</button>
+        </div>
+        <div class="zoom-control">
+          <label for="zoomRange"><i data-lucide="scan" aria-hidden="true"></i><span>Zoom</span></label>
+          <input id="zoomRange" type="range" min="0.8" max="1.5" step="0.05" value="1" aria-label="Map zoom">
+          <output id="zoomValue" for="zoomRange">100%</output>
+        </div>
+      </section>
+
+      <div class="workspace">
+        <section class="map-panel panel">
+          <div class="panel-heading map-heading">
+            <div>
+              <p class="section-kicker">Site plan</p>
+              <h2>Backyard map</h2>
+            </div>
+            <div class="map-meta"><span class="live-dot"></span><span id="placementStatus">Select an item to move it</span></div>
+          </div>
+          <div class="map-viewport" id="mapViewport">
+            <div class="map-stage" id="mapStage" tabindex="0" aria-label="Interactive backyard site plan">
+              <img class="site-plan" src="Backyard Site Plan with Dimensions.png" alt="Aerial backyard site plan with dimensions: 95 foot frontage, 104 foot top edge, 113 foot right side, and 75 foot left side">
+              <div class="items-layer" id="itemsLayer"></div>
+              <div class="draw-preview" id="drawPreview" hidden></div>
+            </div>
+          </div>
+          <div class="map-footer">
+            <div class="scale-key"><span class="scale-line"></span><span>95 ft frontage reference</span><span class="separator">·</span><span id="scaleDetail">1 ft ≈ 1.05% map width</span></div>
+            <div class="map-count" id="mapCount">0 items</div>
+          </div>
+        </section>
+
+        <aside class="side-column">
+          <section class="inspector panel" id="inspectorPanel">
+            <div class="panel-heading compact-heading">
+              <div>
+                <p class="section-kicker">Selected marker</p>
+                <h2 id="inspectorTitle">Add an item</h2>
+              </div>
+              <span class="number-badge muted" id="inspectorNumber">—</span>
+            </div>
+            <div class="empty-inspector" id="emptyInspector">
+              <div class="empty-icon"><i data-lucide="map-pin-plus" aria-hidden="true"></i></div>
+              <p>Choose a quick add, draw a box, or add an item to start your plan.</p>
+              <button class="button button-dark" id="emptyAddButton" type="button"><i data-lucide="plus" aria-hidden="true"></i>Add first item</button>
+            </div>
+            <form class="item-form" id="itemForm" hidden>
+              <div class="field-row">
+                <label class="field wide"><span>Item name</span><input type="text" data-field="name" maxlength="40" placeholder="e.g. Pumpkin toss"></label>
+                <label class="field"><span>Type</span><select data-field="type"><option>Activity</option><option>Seating</option><option>Food &amp; drink</option><option>Decor</option><option>Access</option><option>Other</option></select></label>
+              </div>
+              <div class="dimensions-heading"><span>Footprint</span><small>Set in feet</small></div>
+              <div class="field-row dimensions-row">
+                <label class="field"><span>Width</span><div class="unit-input"><input type="number" data-field="widthFt" min="1" max="95" step="0.5"><em>ft</em></div></label>
+                <span class="dimension-x">×</span>
+                <label class="field"><span>Depth</span><div class="unit-input"><input type="number" data-field="depthFt" min="1" max="95" step="0.5"><em>ft</em></div></label>
+                <button class="lock-button is-locked" id="lockDimensions" type="button" title="Keep width and depth linked" aria-label="Keep width and depth linked"><i data-lucide="lock" aria-hidden="true"></i></button>
+              </div>
+              <div class="rotation-row">
+                <label class="field"><span>Rotation</span><div class="unit-input"><input type="number" data-field="rotation" min="-180" max="180" step="5"><em>deg</em></div></label>
+                <button class="lock-button" id="rotateLeft" type="button" title="Rotate left 15 degrees" aria-label="Rotate left 15 degrees"><i data-lucide="rotate-ccw" aria-hidden="true"></i></button>
+                <button class="lock-button" id="rotateRight" type="button" title="Rotate right 15 degrees" aria-label="Rotate right 15 degrees"><i data-lucide="rotate-cw" aria-hidden="true"></i></button>
+              </div>
+              <div class="field">
+                <span>Marker color</span>
+                <div class="swatches" role="radiogroup" aria-label="Marker color">
+                  <button type="button" class="swatch coral" data-color="coral" aria-label="Coral"></button>
+                  <button type="button" class="swatch yellow" data-color="yellow" aria-label="Yellow"></button>
+                  <button type="button" class="swatch teal" data-color="teal" aria-label="Teal"></button>
+                  <button type="button" class="swatch plum" data-color="plum" aria-label="Plum"></button>
+                  <button type="button" class="swatch blue" data-color="blue" aria-label="Blue"></button>
+                </div>
+              </div>
+              <label class="field"><span>Reference / owner</span><input type="text" data-field="reference" maxlength="50" placeholder="e.g. Aunt Jess · bring props"></label>
+              <label class="field"><span>Notes</span><textarea data-field="notes" rows="3" maxlength="240" placeholder="Power, setup, supplies, or timing notes"></textarea></label>
+              <div class="form-actions">
+                <button class="button button-dark" type="button" id="duplicateButton"><i data-lucide="copy" aria-hidden="true"></i>Duplicate</button>
+                <button class="button button-danger" type="button" id="deleteButton"><i data-lucide="trash-2" aria-hidden="true"></i>Delete</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="items-panel panel">
+            <div class="panel-heading compact-heading list-heading">
+              <div>
+                <p class="section-kicker">Plan notes</p>
+                <h2>Placed items</h2>
+              </div>
+              <span class="list-total" id="listTotal">0</span>
+            </div>
+            <div class="items-list" id="itemsList"></div>
+            <div class="empty-list" id="emptyList" hidden>
+              <i data-lucide="list-plus" aria-hidden="true"></i>
+              <p>Your numbered references will appear here.</p>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
