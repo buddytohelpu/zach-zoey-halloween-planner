@@ -1,9 +1,9 @@
 {
-  "revision": 23,
+  "revision": 24,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
-      "name": "New setup",
+      "name": "BounceHouse 1",
       "type": "Other",
       "widthFt": 10,
       "depthFt": 10,
@@ -28,5 +28,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T22:28:51.789Z"
+  "updatedAt": "2026-10-15T22:28:58.336Z"
 }
