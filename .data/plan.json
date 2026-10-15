@@ -1,5 +1,5 @@
 {
-  "revision": 126,
+  "revision": 127,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -45,7 +45,7 @@
       "name": "Game station",
       "type": "Activity",
       "widthFt": 12,
-      "depthFt": 10,
+      "depthFt": 15,
       "x": 22.678700884442506,
       "y": 59.88835725677831,
       "rotation": -15,
@@ -80,5 +80,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:38:17.997Z"
+  "updatedAt": "2026-10-15T23:38:21.650Z"
 }
