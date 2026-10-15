@@ -1,5 +1,5 @@
 {
-  "revision": 86,
+  "revision": 87,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -32,7 +32,7 @@
       "name": "Balloon Artist",
       "type": "Other",
       "widthFt": 1,
-      "depthFt": 1,
+      "depthFt": 16,
       "x": 50.82017543859649,
       "y": 51.570175438596465,
       "rotation": -15,
@@ -41,5 +41,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:36:39.199Z"
+  "updatedAt": "2026-10-15T23:36:41.135Z"
 }
