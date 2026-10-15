@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
 </head>
 <body>
   <div class="auth-gate" id="authGate">
@@ -19,7 +20,8 @@
       <h1>Unlock the yard map</h1>
       <p class="auth-copy">Use the shared party password to open Zach &amp; Zoey's planning board.</p>
       <form id="authForm" class="auth-form">
-        <label class="field"><span>Party password</span><input id="passwordInput" type="password" autocomplete="current-password" autofocus required placeholder="Enter password"></label>
+        <input class="auth-username" type="text" name="username" autocomplete="username" tabindex="-1" aria-hidden="true">
+        <label class="field"><span>Party password</span><input id="passwordInput" name="password" type="password" autocomplete="current-password" autofocus required placeholder="Enter password"></label>
         <button class="button button-dark auth-submit" type="submit"><i data-lucide="key-round" aria-hidden="true"></i><span>Unlock planner</span></button>
         <p class="auth-error" id="authError" role="alert" hidden></p>
       </form>
@@ -157,7 +159,7 @@
     </main>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js?v=20261015-4"></script>
+  <script src="app.js?v=20261015-5"></script>
   <script async src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>
 </body>
 </html>

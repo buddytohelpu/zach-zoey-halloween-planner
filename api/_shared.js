@@ -12,9 +12,16 @@ function configuredPassword() {
   return configured || "ZachZoey";
 }
 
+function normalizedPassword(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .replace(/\s+/g, "")
+    .toLocaleLowerCase("en-US");
+}
+
 function passwordMatches(value) {
-  const candidate = String(value || "").trim();
-  return candidate === configuredPassword() || candidate === "ZachZoey";
+  const candidate = normalizedPassword(value);
+  return candidate === normalizedPassword(configuredPassword()) || candidate === normalizedPassword("ZachZoey");
 }
 
 function sessionToken() {
@@ -60,6 +67,7 @@ module.exports = {
   configuredPassword,
   isAuthenticated,
   json,
+  normalizedPassword,
   passwordMatches,
   readBody,
   sessionCookie

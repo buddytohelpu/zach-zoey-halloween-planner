@@ -15,6 +15,10 @@
     plum: "#7c567c",
     blue: "#4779aa"
   };
+
+  function normalizedPassword(value) {
+    return String(value || "").normalize("NFKC").replace(/\s+/g, "").toLocaleLowerCase("en-US");
+  }
   const PRESETS = {
     bounce: { name: "Bounce house", type: "Activity", widthFt: 20, depthFt: 20, color: "coral", reference: "", notes: "Check delivery clearance and outlet location." },
     game: { name: "Game station", type: "Activity", widthFt: 12, depthFt: 10, color: "yellow", reference: "", notes: "" },
@@ -124,7 +128,7 @@
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, items: state.items }));
         state.remoteDirty = state.authenticated && state.authApiAvailable;
-        setSavedStatus(state.remoteDirty ? "Saving shared plan…" : "Saved locally", state.remoteDirty ? "cloud-upload" : "cloud-check");
+        setSavedStatus(state.remoteDirty ? "Saving shared plan…" : "Saved locally", state.remoteDirty ? "cloud-upload" : "cloud");
         if (state.remoteDirty) queueRemoteSave();
         refreshIcons();
       } catch (error) {
@@ -133,7 +137,7 @@
     }, 180);
   }
 
-  function setSavedStatus(label, icon = "cloud-check") {
+  function setSavedStatus(label, icon = "cloud") {
     els.savedStatus.innerHTML = `<i data-lucide="${icon}" aria-hidden="true"></i>${label}`;
     refreshIcons();
   }
@@ -168,7 +172,7 @@
       const payload = await response.json();
       state.remoteRevision = Number(payload.revision || state.remoteRevision + 1);
       state.remoteDirty = false;
-      setSavedStatus("Saved to shared plan", "cloud-check");
+      setSavedStatus("Saved to shared plan", "cloud");
     } catch (error) {
       state.remoteAvailable = false;
       setSavedStatus("Local copy · sync paused", "cloud-off");
@@ -197,7 +201,7 @@
         state.remoteDirty = false;
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ version: 1, items: state.items })); } catch (error) { /* local fallback is optional */ }
         renderAll();
-        setSavedStatus("Saved to shared plan", "cloud-check");
+        setSavedStatus("Saved to shared plan", "cloud");
       } else {
         state.remoteDirty = true;
         setSavedStatus("Preparing shared plan…", "cloud-upload");
@@ -231,7 +235,7 @@
   async function submitPassword(event) {
     event.preventDefault();
     const password = els.passwordInput.value.trim();
-    const knownPassword = password === AUTH_FALLBACK_PASSWORD;
+    const knownPassword = normalizedPassword(password) === normalizedPassword(AUTH_FALLBACK_PASSWORD);
     els.authError.hidden = true;
     try {
       const response = await fetch(AUTH_ENDPOINT, {
@@ -273,7 +277,7 @@
       window.clearInterval(state.remotePollTimer);
       state.remotePollTimer = window.setInterval(() => syncRemotePlan({ quiet: true }), REMOTE_POLL_MS);
     } else {
-      setSavedStatus("Saved locally", "cloud-check");
+      setSavedStatus("Saved locally", "cloud");
     }
     refreshIcons();
   }
