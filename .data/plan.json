@@ -1,9 +1,9 @@
 {
-  "revision": 48,
+  "revision": 49,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
-      "name": "New setup",
+      "name": "New",
       "type": "Other",
       "widthFt": 10,
       "depthFt": 10,
@@ -41,5 +41,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T22:51:15.384Z"
+  "updatedAt": "2026-10-15T22:51:17.018Z"
 }
