@@ -1,5 +1,5 @@
 {
-  "revision": 197,
+  "revision": 198,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -159,7 +159,7 @@
     },
     {
       "id": "party-item-mva6pmnc-6ysbe",
-      "name": "Game 7 copy",
+      "name": "Game 8",
       "type": "Activity",
       "widthFt": 5,
       "depthFt": 5,
@@ -197,5 +197,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:43:38.318Z"
+  "updatedAt": "2026-10-15T23:43:45.632Z"
 }
