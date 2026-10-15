@@ -1,6 +1,6 @@
 # Zach & Zoey Halloween Party Planner
 
-This is a small Vercel app. It uses the supplied site-plan image as the map, gates the board with the shared party password, and stores the working layout in a shared Upstash/Vercel KV document so every browser sees the same markers.
+This is a small Vercel app. It uses the supplied site-plan image as the map, gates the board with the shared party password, and stores the working layout in a shared document so every browser sees the same markers.
 
 ## Run locally
 
@@ -16,13 +16,20 @@ The local-only version accepts `ZachZoey` in the password screen and saves to th
 
 ## Deploy
 
-The repository can be imported into Vercel with no build command or output directory. In the Vercel project, create an Upstash Redis/Vercel KV store and add these environment variables for Production and Preview:
+The repository can be imported into Vercel with no build command or output directory. Redis/Vercel KV is supported when these variables are present:
 
 - `KV_REST_API_URL`
 - `KV_REST_API_TOKEN`
-- `PLAN_PASSWORD` = `ZachZoey`
-- `PLAN_SESSION_SECRET` = a long random value
 
-The API accepts only the authenticated session cookie, and plan writes use a revision check plus an item merge when two browsers save close together.
+When Redis is not configured, the deployed project uses the GitHub Contents API as its shared store. The current project uses:
+
+- `PLAN_GITHUB_TOKEN` = a GitHub token with `contents:write` access to the planner repository
+- `PLAN_GITHUB_BRANCH` = `plan-data`
+
+The repository and `.data/plan.json` path have sensible defaults in `api/plan.js`. Keep the GitHub token in Vercel environment variables; never commit it.
+
+For either storage option, set `PLAN_PASSWORD` to `ZachZoey` and `PLAN_SESSION_SECRET` to a long random value.
+
+The API accepts only the authenticated session cookie, and plan writes use a revision check plus the GitHub file SHA when two browsers save close together.
 
 Use the download icon in the header to export a JSON backup before changing storage settings or switching devices.
