@@ -1,5 +1,5 @@
 {
-  "revision": 282,
+  "revision": 283,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -247,7 +247,20 @@
       "color": "blue",
       "reference": "",
       "notes": ""
+    },
+    {
+      "id": "party-item-mva6w787-d7vhy",
+      "name": "Food & drink table",
+      "type": "Food & drink",
+      "widthFt": 18,
+      "depthFt": 4,
+      "x": 40.526315789473685,
+      "y": 47.89473684210526,
+      "rotation": 0,
+      "color": "teal",
+      "reference": "",
+      "notes": "Leave room behind the table for serving."
     }
   ],
-  "updatedAt": "2026-10-15T23:48:07.108Z"
+  "updatedAt": "2026-10-15T23:48:26.471Z"
 }
