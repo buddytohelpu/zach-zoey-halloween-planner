@@ -1,5 +1,5 @@
 {
-  "revision": 147,
+  "revision": 148,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -93,18 +93,18 @@
       "notes": ""
     },
     {
-      "id": "party-item-mva6mf9a-2ll5v",
-      "name": "New setup copy",
-      "type": "Other",
-      "widthFt": 10,
-      "depthFt": 10,
-      "x": 59.67129961187235,
-      "y": 12.50011038276439,
+      "id": "party-item-mva6mnk8-gb9yd",
+      "name": "Game station copy copy",
+      "type": "Activity",
+      "widthFt": 5,
+      "depthFt": 5,
+      "x": 24.521866391184567,
+      "y": 62.125534652747575,
       "rotation": -15,
-      "color": "coral",
+      "color": "yellow",
       "reference": "",
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:40:56.360Z"
+  "updatedAt": "2026-10-15T23:41:01.061Z"
 }
