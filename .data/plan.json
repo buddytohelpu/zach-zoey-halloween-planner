@@ -1,5 +1,5 @@
 {
-  "revision": 269,
+  "revision": 270,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -237,7 +237,7 @@
     },
     {
       "id": "party-item-mva6uqkr-3s72p",
-      "name": "New setup",
+      "name": "Fog",
       "type": "Other",
       "widthFt": 2,
       "depthFt": 2,
@@ -249,5 +249,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:47:33.037Z"
+  "updatedAt": "2026-10-15T23:47:35.071Z"
 }
