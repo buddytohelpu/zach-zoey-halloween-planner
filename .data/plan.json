@@ -1,5 +1,5 @@
 {
-  "revision": 188,
+  "revision": 189,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -156,7 +156,20 @@
       "color": "yellow",
       "reference": "",
       "notes": ""
+    },
+    {
+      "id": "party-item-mva6pmnc-6ysbe",
+      "name": "Game 7 copy",
+      "type": "Activity",
+      "widthFt": 5,
+      "depthFt": 5,
+      "x": 28.351727502295677,
+      "y": 29.32345131941425,
+      "rotation": -30,
+      "color": "yellow",
+      "reference": "",
+      "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:43:08.684Z"
+  "updatedAt": "2026-10-15T23:43:19.799Z"
 }
