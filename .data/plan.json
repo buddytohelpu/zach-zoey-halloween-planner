@@ -1,5 +1,5 @@
 {
-  "revision": 169,
+  "revision": 170,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -50,19 +50,6 @@
       "y": 65.67414576385866,
       "rotation": -15,
       "color": "yellow",
-      "reference": "",
-      "notes": ""
-    },
-    {
-      "id": "party-item-mva6i973-oq2wx",
-      "name": "New setup",
-      "type": "Other",
-      "widthFt": 10,
-      "depthFt": 10,
-      "x": 39.296070755400876,
-      "y": 40.948963317384376,
-      "rotation": 0,
-      "color": "blue",
       "reference": "",
       "notes": ""
     },
@@ -171,5 +158,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:42:01.499Z"
+  "updatedAt": "2026-10-15T23:42:03.884Z"
 }
