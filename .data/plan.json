@@ -1,5 +1,5 @@
 {
-  "revision": 283,
+  "revision": 284,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -252,7 +252,7 @@
       "id": "party-item-mva6w787-d7vhy",
       "name": "Food & drink table",
       "type": "Food & drink",
-      "widthFt": 18,
+      "widthFt": 8,
       "depthFt": 4,
       "x": 40.526315789473685,
       "y": 47.89473684210526,
@@ -262,5 +262,5 @@
       "notes": "Leave room behind the table for serving."
     }
   ],
-  "updatedAt": "2026-10-15T23:48:26.471Z"
+  "updatedAt": "2026-10-15T23:48:33.660Z"
 }
