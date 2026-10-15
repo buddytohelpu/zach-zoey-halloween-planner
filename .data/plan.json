@@ -1,5 +1,5 @@
 {
-  "revision": 10,
+  "revision": 11,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -7,13 +7,13 @@
       "type": "Other",
       "widthFt": 10,
       "depthFt": 10,
-      "x": 13.385272741082552,
-      "y": 77.18371813953942,
+      "x": 14.262926623777105,
+      "y": 74.55075649145576,
       "rotation": 0,
       "color": "blue",
       "reference": "",
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T22:27:56.184Z"
+  "updatedAt": "2026-10-15T22:27:59.140Z"
 }
