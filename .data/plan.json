@@ -1,5 +1,5 @@
 {
-  "revision": 256,
+  "revision": 257,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -226,8 +226,8 @@
       "id": "party-item-mva6ti7i-6rw7v",
       "name": "Feel Table",
       "type": "Activity",
-      "widthFt": 5,
-      "depthFt": 5,
+      "widthFt": 3,
+      "depthFt": 3,
       "x": 43.90033861340679,
       "y": 61.53872909719203,
       "rotation": -15,
@@ -236,5 +236,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:46:42.697Z"
+  "updatedAt": "2026-10-15T23:46:47.516Z"
 }
