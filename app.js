@@ -72,7 +72,11 @@
     authApiAvailable: false,
     remoteAvailable: false,
     drag: null,
-    draw: null
+    draw: null,
+    pan: null,
+    pointers: new Map(),
+    gesture: null,
+    suppressSinglePointer: false
   };
 
   function uid() {
@@ -489,41 +493,229 @@
     return Number.isInteger(number) ? String(number) : number.toFixed(1);
   }
 
-  function stagePoint(event) {
+  function stagePointFromClient(clientX, clientY) {
     const rect = els.stage.getBoundingClientRect();
     return {
-      x: clampNumber((event.clientX - rect.left) / rect.width * 100, 0, 100, 0),
-      y: clampNumber((event.clientY - rect.top) / rect.height * 100, 0, 100, 0)
+      x: clampNumber((clientX - rect.left) / rect.width * 100, 0, 100, 0),
+      y: clampNumber((clientY - rect.top) / rect.height * 100, 0, 100, 0)
     };
   }
 
+  function stagePoint(event) {
+    return stagePointFromClient(event.clientX, event.clientY);
+  }
+
+  function itemAtPoint(point) {
+    const stageRect = els.stage.getBoundingClientRect();
+    const toleranceX = 10 / Math.max(1, stageRect.width) * 100;
+    const toleranceY = 10 / Math.max(1, stageRect.height) * 100;
+    const candidates = [...state.items].sort((first, second) => {
+      if (first.id === state.selectedId) return -1;
+      if (second.id === state.selectedId) return 1;
+      return 0;
+    });
+    return candidates.find((item) => {
+      const widthPct = item.widthFt * SCALE_PERCENT_PER_FT;
+      const heightPct = item.depthFt * SCALE_PERCENT_PER_FT;
+      const centerX = item.x + widthPct / 2;
+      const centerY = item.y + heightPct / 2;
+      const radians = item.rotation * Math.PI / 180;
+      const deltaX = point.x - centerX;
+      const deltaY = point.y - centerY;
+      const localX = deltaX * Math.cos(radians) + deltaY * Math.sin(radians);
+      const localY = -deltaX * Math.sin(radians) + deltaY * Math.cos(radians);
+      return Math.abs(localX) <= widthPct / 2 + toleranceX && Math.abs(localY) <= heightPct / 2 + toleranceY;
+    }) || null;
+  }
+
+  function rememberTouchPointer(event) {
+    if (event.pointerType !== "touch") return;
+    state.pointers.set(event.pointerId, {
+      pointerId: event.pointerId,
+      clientX: event.clientX,
+      clientY: event.clientY
+    });
+  }
+
+  function updateTouchPointer(event) {
+    const pointer = state.pointers.get(event.pointerId);
+    if (!pointer) return;
+    pointer.clientX = event.clientX;
+    pointer.clientY = event.clientY;
+  }
+
+  function activeTouchPointers() {
+    return Array.from(state.pointers.values()).slice(0, 2);
+  }
+
+  function pointerDistance(first, second) {
+    return Math.hypot(second.clientX - first.clientX, second.clientY - first.clientY);
+  }
+
+  function pointerAngle(first, second) {
+    return Math.atan2(second.clientY - first.clientY, second.clientX - first.clientX) * 180 / Math.PI;
+  }
+
+  function pointerMidpoint(first, second) {
+    return {
+      clientX: (first.clientX + second.clientX) / 2,
+      clientY: (first.clientY + second.clientY) / 2
+    };
+  }
+
+  function normalizeAngle(value) {
+    return ((value + 180) % 360 + 360) % 360 - 180;
+  }
+
+  function normalizeRotation(value) {
+    return Math.round(normalizeAngle(value));
+  }
+
+  function beginMultiTouch() {
+    const pointers = activeTouchPointers();
+    if (pointers.length < 2 || state.gesture) return;
+    const [first, second] = pointers;
+    const firstPoint = stagePointFromClient(first.clientX, first.clientY);
+    const secondPoint = stagePointFromClient(second.clientX, second.clientY);
+    const firstItem = state.tool === "select" ? itemAtPoint(firstPoint) : null;
+    const secondItem = state.tool === "select" ? itemAtPoint(secondPoint) : null;
+    const rotateItem = firstItem && secondItem && firstItem.id === secondItem.id ? firstItem : null;
+    const midpoint = pointerMidpoint(first, second);
+    const stageRect = els.stage.getBoundingClientRect();
+
+    if (state.drag) {
+      state.drag = null;
+      persist();
+    }
+    state.pan = null;
+    if (state.draw) clearDrawPreview();
+    state.suppressSinglePointer = true;
+    state.gesture = {
+      mode: rotateItem ? "rotate" : "zoom",
+      pointerIds: [first.pointerId, second.pointerId],
+      startDistance: Math.max(1, pointerDistance(first, second)),
+      startAngle: pointerAngle(first, second),
+      startZoom: state.zoom,
+      itemId: rotateItem?.id || null,
+      startRotation: rotateItem?.rotation || 0,
+      anchor: {
+        mapX: clampNumber((midpoint.clientX - stageRect.left) / stageRect.width, 0, 1, 0.5),
+        mapY: clampNumber((midpoint.clientY - stageRect.top) / stageRect.height, 0, 1, 0.5)
+      }
+    };
+    els.stage.classList.add("is-gesturing");
+  }
+
+  function updateMultiTouch() {
+    if (!state.gesture) return;
+    const pointers = activeTouchPointers();
+    if (pointers.length < 2) return;
+    const [first, second] = pointers;
+    const midpoint = pointerMidpoint(first, second);
+    if (state.gesture.mode === "rotate") {
+      const item = state.items.find((candidate) => candidate.id === state.gesture.itemId);
+      if (!item) return;
+      item.rotation = normalizeRotation(state.gesture.startRotation + normalizeAngle(pointerAngle(first, second) - state.gesture.startAngle));
+      renderMap();
+      const rotationField = els.itemForm.querySelector('[data-field="rotation"]');
+      if (rotationField) rotationField.value = item.rotation;
+      return;
+    }
+    const nextZoom = state.gesture.startZoom * pointerDistance(first, second) / state.gesture.startDistance;
+    setZoom(nextZoom, {
+      clientX: midpoint.clientX,
+      clientY: midpoint.clientY,
+      mapX: state.gesture.anchor.mapX,
+      mapY: state.gesture.anchor.mapY
+    });
+  }
+
+  function endMultiTouch() {
+    const gesture = state.gesture;
+    state.gesture = null;
+    els.stage.classList.remove("is-gesturing");
+    if (gesture?.mode !== "rotate") return;
+    persist();
+    renderMap();
+    renderInspector();
+    updateStatus();
+  }
+
+  function startTouchPan(event) {
+    state.pan = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      scrollLeft: els.viewport.scrollLeft,
+      scrollTop: els.viewport.scrollTop,
+      pageX: window.scrollX,
+      pageY: window.scrollY
+    };
+  }
+
+  function updateTouchPan(event) {
+    if (!state.pan || state.pan.pointerId !== event.pointerId) return;
+    const deltaX = event.clientX - state.pan.startX;
+    const deltaY = event.clientY - state.pan.startY;
+    els.viewport.scrollLeft = state.pan.scrollLeft - deltaX;
+    els.viewport.scrollTop = state.pan.scrollTop - deltaY;
+    window.scrollTo(state.pan.pageX, Math.max(0, state.pan.pageY - deltaY));
+  }
+
   function onStagePointerDown(event) {
+    rememberTouchPointer(event);
+    if (event.pointerType === "touch") {
+      els.stage.setPointerCapture?.(event.pointerId);
+      if (state.pointers.size >= 2) {
+        beginMultiTouch();
+        event.preventDefault();
+        return;
+      }
+    }
     const itemElement = event.target.closest?.(".map-item");
     if (state.tool === "draw" && !itemElement) {
       const point = stagePoint(event);
-      state.draw = { start: point, current: point };
+      state.draw = { pointerId: event.pointerId, start: point, current: point };
       els.stage.setPointerCapture?.(event.pointerId);
       drawPreview(point, point);
       event.preventDefault();
       return;
     }
-    if (state.tool !== "select" || !itemElement) return;
+    if (state.tool !== "select" || !itemElement) {
+      if (event.pointerType === "touch" && state.tool === "select" && !state.suppressSinglePointer) {
+        startTouchPan(event);
+        event.preventDefault();
+      }
+      return;
+    }
     const item = state.items.find((candidate) => candidate.id === itemElement.dataset.id);
     if (!item) return;
     selectItem(item.id);
     const point = stagePoint(event);
-    state.drag = { id: item.id, start: point, origin: { x: item.x, y: item.y } };
+    state.drag = { pointerId: event.pointerId, id: item.id, start: point, origin: { x: item.x, y: item.y } };
     els.stage.setPointerCapture?.(event.pointerId);
     event.preventDefault();
   }
 
   function onStagePointerMove(event) {
-    if (state.draw) {
-      state.draw.current = stagePoint(event);
-      drawPreview(state.draw.start, state.draw.current);
+    updateTouchPointer(event);
+    if (state.gesture) {
+      updateMultiTouch();
+      event.preventDefault();
       return;
     }
-    if (!state.drag) return;
+    if (state.pan) {
+      updateTouchPan(event);
+      event.preventDefault();
+      return;
+    }
+    if (state.draw && state.draw.pointerId === event.pointerId) {
+      state.draw.current = stagePoint(event);
+      drawPreview(state.draw.start, state.draw.current);
+      event.preventDefault();
+      return;
+    }
+    if (!state.drag || state.drag.pointerId !== event.pointerId) return;
     const item = state.items.find((candidate) => candidate.id === state.drag.id);
     if (!item) return;
     const point = stagePoint(event);
@@ -533,10 +725,21 @@
     item.y = clampNumber(state.drag.origin.y + point.y - state.drag.start.y, 0, 100 - heightPct, item.y);
     renderMap();
     updateStatus();
+    event.preventDefault();
   }
 
   function onStagePointerUp(event) {
-    if (state.draw) {
+    if (event.pointerType === "touch") {
+      state.pointers.delete(event.pointerId);
+      if (state.gesture) {
+        if (state.pointers.size < 2) endMultiTouch();
+        if (state.pointers.size === 0) state.suppressSinglePointer = false;
+        event.preventDefault();
+        return;
+      }
+      if (state.pointers.size === 0) state.suppressSinglePointer = false;
+    }
+    if (state.draw && state.draw.pointerId === event.pointerId) {
       const end = stagePoint(event);
       const left = Math.min(state.draw.start.x, end.x);
       const top = Math.min(state.draw.start.y, end.y);
@@ -556,12 +759,25 @@
       }
       return;
     }
-    if (state.drag) {
+    if (state.pan && state.pan.pointerId === event.pointerId) {
+      state.pan = null;
+      return;
+    }
+    if (state.drag && state.drag.pointerId === event.pointerId) {
       state.drag = null;
       persist();
       renderList();
       updateStatus();
     }
+  }
+
+  function onStagePointerCancel(event) {
+    if (state.draw && state.draw.pointerId === event.pointerId) {
+      clearDrawPreview();
+      if (event.pointerType === "touch") state.pointers.delete(event.pointerId);
+      return;
+    }
+    onStagePointerUp(event);
   }
 
   function drawPreview(start, end) {
@@ -600,11 +816,19 @@
     event.preventDefault();
   }
 
-  function setZoom(value) {
-    state.zoom = Number(value);
+  function setZoom(value, anchor = null) {
+    const nextZoom = clampNumber(value, 0.8, 1.5, state.zoom || 1);
+    state.zoom = Math.round(nextZoom * 100) / 100;
     els.stage.style.width = `${state.zoom * 100}%`;
+    els.zoomRange.value = String(state.zoom);
     els.zoomValue.value = `${Math.round(state.zoom * 100)}%`;
     els.zoomValue.textContent = `${Math.round(state.zoom * 100)}%`;
+    if (!anchor) return;
+    const rect = els.stage.getBoundingClientRect();
+    const anchoredPointX = rect.left + anchor.mapX * rect.width;
+    const anchoredPointY = rect.top + anchor.mapY * rect.height;
+    els.viewport.scrollLeft += anchoredPointX - anchor.clientX;
+    els.viewport.scrollTop += anchoredPointY - anchor.clientY;
   }
 
   function exportPlan() {
@@ -692,7 +916,7 @@
   els.stage.addEventListener("pointerdown", onStagePointerDown);
   els.stage.addEventListener("pointermove", onStagePointerMove);
   els.stage.addEventListener("pointerup", onStagePointerUp);
-  els.stage.addEventListener("pointercancel", onStagePointerUp);
+  els.stage.addEventListener("pointercancel", onStagePointerCancel);
   els.stage.addEventListener("keydown", handleKeydown);
   els.itemsList.addEventListener("click", (event) => {
     const card = event.target.closest(".item-card");

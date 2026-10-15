@@ -214,10 +214,11 @@ h2 { margin: 0; font-size: 18px; line-height: 1.1; font-weight: 600; }
 .map-meta { gap: 7px; color: #69766f; font-size: 11px; white-space: nowrap; }
 .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 3px #d7eeea; }
 .map-viewport { min-height: 400px; max-height: calc(100vh - 240px); overflow: auto; overscroll-behavior: contain; padding: 13px; background: #dfe6de; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.map-stage { position: relative; width: 100%; margin: 0 auto; aspect-ratio: 1; outline: none; touch-action: pan-x pan-y; transition: width .2s ease; }
+.map-stage { position: relative; width: 100%; margin: 0 auto; aspect-ratio: 1; outline: none; touch-action: none; transition: width .2s ease; }
+.map-stage.is-gesturing { transition: none; }
 .site-plan { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: contain; user-select: none; pointer-events: none; }
 .items-layer { position: absolute; inset: 0; }
-.map-stage.is-drawing { cursor: crosshair; touch-action: none; }
+.map-stage.is-drawing { cursor: crosshair; }
 .map-stage.is-drawing .site-plan { pointer-events: none; }
 .map-item {
   --marker: var(--coral);
@@ -271,6 +272,7 @@ h2 { margin: 0; font-size: 18px; line-height: 1.1; font-weight: 600; }
 .scale-key { gap: 7px; flex-wrap: wrap; }
 .scale-line { width: 28px; height: 5px; display: inline-block; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink); }
 .separator { color: #abb3ae; }
+.gesture-hint { display: none; color: var(--teal-dark); font-weight: 700; }
 .map-count { font-weight: 700; white-space: nowrap; }
 
 .side-column { display: grid; gap: 16px; min-width: 0; }
@@ -371,6 +373,7 @@ h2 { margin: 0; font-size: 18px; line-height: 1.1; font-weight: 600; }
   .map-heading { align-items: flex-start; padding-inline: 13px; }
   .map-meta { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
   .map-footer { align-items: flex-start; flex-direction: column; gap: 5px; padding-inline: 13px; }
+  .gesture-hint { display: inline; width: 100%; }
   .map-viewport { min-height: 0; padding: 9px; }
   .map-item::after { inset: -9px; }
   .field input, .field select, .field textarea { min-height: 42px; font-size: 16px; }
