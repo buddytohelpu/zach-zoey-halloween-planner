@@ -39,6 +39,7 @@ body:not(.is-authenticated) .app-shell { visibility: hidden; }
   padding: 20px;
   background: var(--ink);
 }
+.auth-gate[hidden] { display: none; }
 .auth-card {
   width: min(100%, 390px);
   padding: 30px;
