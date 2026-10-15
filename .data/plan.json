@@ -1,5 +1,5 @@
 {
-  "revision": 66,
+  "revision": 67,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -16,7 +16,7 @@
     },
     {
       "id": "party-item-mva41o2w-zv4ra",
-      "name": "Bo",
+      "name": "Bounce house",
       "type": "Other",
       "widthFt": 10,
       "depthFt": 10,
@@ -28,5 +28,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T22:57:36.764Z"
+  "updatedAt": "2026-10-15T22:57:42.565Z"
 }
