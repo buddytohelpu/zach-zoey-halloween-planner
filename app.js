@@ -231,21 +231,32 @@
   async function submitPassword(event) {
     event.preventDefault();
     const password = els.passwordInput.value.trim();
+    const knownPassword = password === AUTH_FALLBACK_PASSWORD;
     els.authError.hidden = true;
     try {
-      if (!state.authApiAvailable) {
-        if (password !== AUTH_FALLBACK_PASSWORD) throw new Error("That password is not right.");
-      } else {
-        const response = await fetch(AUTH_ENDPOINT, {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password })
-        });
-        if (!response.ok) throw new Error(response.status === 401 ? "That password is not right." : "The planner could not unlock.");
+      const response = await fetch(AUTH_ENDPOINT, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password })
+      });
+      if (!response.ok) {
+        if (response.status === 401 && !knownPassword) throw new Error("That password is not right.");
+        if (!knownPassword) throw new Error("The planner could not unlock.");
+        throw new Error("Shared login is temporarily unavailable.");
       }
+      state.authApiAvailable = true;
       unlockPlanner();
     } catch (error) {
+      // Keep the board usable if an old deployment, blocked request, or a
+      // temporary API outage prevents the shared session from being created.
+      // The next successful shared login will restore collaboration.
+      if (knownPassword) {
+        state.authApiAvailable = false;
+        unlockPlanner();
+        showToast("Opened a local copy while shared login reconnects.");
+        return;
+      }
       els.authError.textContent = error.message;
       els.authError.hidden = false;
       els.passwordInput.select();
