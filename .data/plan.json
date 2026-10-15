@@ -1,5 +1,5 @@
 {
-  "revision": 182,
+  "revision": 183,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -133,7 +133,7 @@
     },
     {
       "id": "party-item-mva6na26-vvd2p",
-      "name": "Game station copy copy copy copy copy co",
+      "name": "Game 5",
       "type": "Activity",
       "widthFt": 5,
       "depthFt": 5,
@@ -158,5 +158,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:42:50.204Z"
+  "updatedAt": "2026-10-15T23:42:54.755Z"
 }
