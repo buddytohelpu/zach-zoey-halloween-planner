@@ -1,5 +1,5 @@
 {
-  "revision": 291,
+  "revision": 292,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -254,13 +254,13 @@
       "type": "Food & drink",
       "widthFt": 8,
       "depthFt": 4,
-      "x": 40.526315789473685,
-      "y": 47.89473684210526,
+      "x": 37.488121345029256,
+      "y": 47.37390350877193,
       "rotation": 75,
       "color": "teal",
       "reference": "",
       "notes": "Leave room behind the table for serving."
     }
   ],
-  "updatedAt": "2026-10-15T23:48:54.709Z"
+  "updatedAt": "2026-10-15T23:48:57.604Z"
 }
