@@ -1,5 +1,5 @@
 {
-  "revision": 193,
+  "revision": 194,
   "items": [
     {
       "id": "party-item-mva40in4-elfz8",
@@ -137,8 +137,8 @@
       "type": "Activity",
       "widthFt": 5,
       "depthFt": 5,
-      "x": 20.202421946740124,
-      "y": 29.420673541636447,
+      "x": 21.070477502295677,
+      "y": 30.983173541636447,
       "rotation": -30,
       "color": "yellow",
       "reference": "",
@@ -150,8 +150,8 @@
       "type": "Activity",
       "widthFt": 5,
       "depthFt": 5,
-      "x": 25.351727502295677,
-      "y": 26.32345131941425,
+      "x": 25.785755280073456,
+      "y": 28.233173541636475,
       "rotation": -30,
       "color": "yellow",
       "reference": "",
@@ -197,5 +197,5 @@
       "notes": ""
     }
   ],
-  "updatedAt": "2026-10-15T23:43:29.575Z"
+  "updatedAt": "2026-10-15T23:43:31.648Z"
 }
