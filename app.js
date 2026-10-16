@@ -6,8 +6,30 @@
   const AUTH_ENDPOINT = "/api/auth";
   const PLAN_ENDPOINT = "/api/plan";
   const REMOTE_POLL_MS = 10000;
-  const FRONTAGE_FT = 95;
-  const SCALE_PERCENT_PER_FT = 100 / FRONTAGE_FT;
+  const MAX_DIMENSION_FT = 113;
+  // The image is a 1,254px square. These reference points follow the four
+  // measured edges in the supplied aerial plan and let the scale vary across
+  // the photographed yard instead of treating the white image margin as yard.
+  const SITE_EDGES = {
+    back: { from: [132, 402], to: [827, 23], feet: 104 },
+    house: { from: [337, 1184], to: [1015, 1182], feet: 95 },
+    left: { from: [132, 402], to: [337, 1184], feet: 75 },
+    right: { from: [827, 23], to: [1071, 778], feet: 113 }
+  };
+  const IMAGE_SIZE_PX = 1254;
+
+  function edgeSpanPercent(edge) {
+    const dx = edge.to[0] - edge.from[0];
+    const dy = edge.to[1] - edge.from[1];
+    return Math.hypot(dx, dy) / IMAGE_SIZE_PX * 100;
+  }
+
+  const SITE_SCALE = {
+    topWidthPercentPerFoot: edgeSpanPercent(SITE_EDGES.back) / SITE_EDGES.back.feet,
+    bottomWidthPercentPerFoot: edgeSpanPercent(SITE_EDGES.house) / SITE_EDGES.house.feet,
+    leftDepthPercentPerFoot: edgeSpanPercent(SITE_EDGES.left) / SITE_EDGES.left.feet,
+    rightDepthPercentPerFoot: edgeSpanPercent(SITE_EDGES.right) / SITE_EDGES.right.feet
+  };
   const COLOR_VARS = {
     coral: "#e86e48",
     yellow: "#efb943",
@@ -88,24 +110,25 @@
   }
 
   function normalizeItem(raw, index) {
-    const widthFt = clampNumber(raw.widthFt, 1, FRONTAGE_FT, 10);
-    const depthFt = clampNumber(raw.depthFt, 1, FRONTAGE_FT, 10);
-    const widthPct = widthFt * SCALE_PERCENT_PER_FT;
-    const heightPct = depthFt * SCALE_PERCENT_PER_FT;
-    return {
+    const widthFt = clampNumber(raw.widthFt, 1, MAX_DIMENSION_FT, 10);
+    const depthFt = clampNumber(raw.depthFt, 1, MAX_DIMENSION_FT, 10);
+    const defaultSize = itemSize({ widthFt, depthFt, x: 50, y: 50 });
+    const item = {
       id: raw.id || uid(),
       number: index + 1,
       name: String(raw.name || "New setup").slice(0, 40),
       type: String(raw.type || "Other"),
       widthFt,
       depthFt,
-      x: clampNumber(raw.x, 0, 100 - widthPct, 50 - widthPct / 2),
-      y: clampNumber(raw.y, 0, 100 - heightPct, 50 - heightPct / 2),
+      x: clampNumber(raw.x, 0, 100, 50 - defaultSize.widthPct / 2),
+      y: clampNumber(raw.y, 0, 100, 50 - defaultSize.heightPct / 2),
       rotation: clampNumber(raw.rotation, -180, 180, 0),
       color: COLOR_VARS[raw.color] ? raw.color : "blue",
       reference: String(raw.reference || "").slice(0, 50),
       notes: String(raw.notes || "").slice(0, 240)
     };
+    keepInBounds(item);
+    return item;
   }
 
   function clampNumber(value, min, max, fallback) {
@@ -114,11 +137,36 @@
     return Math.min(max, Math.max(min, number));
   }
 
+  function interpolate(first, second, percent) {
+    const amount = clampNumber(percent, 0, 100, 50) / 100;
+    return first + (second - first) * amount;
+  }
+
+  function widthPercentForFeet(feet, yPercent) {
+    return feet * interpolate(SITE_SCALE.topWidthPercentPerFoot, SITE_SCALE.bottomWidthPercentPerFoot, yPercent);
+  }
+
+  function depthPercentForFeet(feet, xPercent) {
+    return feet * interpolate(SITE_SCALE.leftDepthPercentPerFoot, SITE_SCALE.rightDepthPercentPerFoot, xPercent);
+  }
+
+  function itemSize(item) {
+    let widthPct = widthPercentForFeet(item.widthFt, item.y);
+    let heightPct = depthPercentForFeet(item.depthFt, item.x);
+    // Width and depth scales vary slightly across the image. Recalculate at
+    // the footprint center so a large item gets a stable local calibration.
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      widthPct = widthPercentForFeet(item.widthFt, Number(item.y) + heightPct / 2);
+      heightPct = depthPercentForFeet(item.depthFt, Number(item.x) + widthPct / 2);
+    }
+    return { widthPct, heightPct };
+  }
+
   function parseDimension(value) {
     const raw = String(value ?? "").trim();
     if (!raw) return null;
     const number = Number(raw);
-    if (!Number.isFinite(number) || number < 1 || number > FRONTAGE_FT) return null;
+    if (!Number.isFinite(number) || number < 1 || number > MAX_DIMENSION_FT) return null;
     return number;
   }
 
@@ -350,8 +398,7 @@
   function renderMap() {
     els.layer.innerHTML = "";
     state.items.forEach((item) => {
-      const widthPct = item.widthFt * SCALE_PERCENT_PER_FT;
-      const heightPct = item.depthFt * SCALE_PERCENT_PER_FT;
+      const { widthPct, heightPct } = itemSize(item);
       const box = document.createElement("div");
       box.className = "map-item";
       if (item.widthFt < 7 || item.depthFt < 6) box.classList.add("is-compact");
@@ -440,16 +487,15 @@
     const preset = PRESETS[presetKey] || PRESETS.blank;
     const widthFt = overrides.widthFt || preset.widthFt;
     const depthFt = overrides.depthFt || preset.depthFt;
-    const widthPct = widthFt * SCALE_PERCENT_PER_FT;
-    const heightPct = depthFt * SCALE_PERCENT_PER_FT;
+    const defaultSize = itemSize({ widthFt, depthFt, x: 50, y: 50 });
     const item = normalizeItem({
       ...preset,
       ...overrides,
       id: uid(),
       widthFt,
       depthFt,
-      x: overrides.x ?? Math.max(0, 50 - widthPct / 2),
-      y: overrides.y ?? Math.max(0, 50 - heightPct / 2)
+      x: overrides.x ?? Math.max(0, 50 - defaultSize.widthPct / 2),
+      y: overrides.y ?? Math.max(0, 50 - defaultSize.heightPct / 2)
     }, state.items.length);
     state.items.push(item);
     state.selectedId = item.id;
@@ -504,11 +550,11 @@
       if (key === "widthFt" && state.lockDimensions) {
         const ratio = item.depthFt / item.widthFt;
         item.widthFt = next;
-        item.depthFt = clampNumber(next * ratio, 1, FRONTAGE_FT, item.depthFt);
+        item.depthFt = clampNumber(next * ratio, 1, MAX_DIMENSION_FT, item.depthFt);
       } else if (key === "depthFt" && state.lockDimensions) {
         const ratio = item.widthFt / item.depthFt;
         item.depthFt = next;
-        item.widthFt = clampNumber(next * ratio, 1, FRONTAGE_FT, item.widthFt);
+        item.widthFt = clampNumber(next * ratio, 1, MAX_DIMENSION_FT, item.widthFt);
       } else {
         item[key] = next;
       }
@@ -542,10 +588,11 @@
   }
 
   function keepInBounds(item) {
-    const widthPct = item.widthFt * SCALE_PERCENT_PER_FT;
-    const heightPct = item.depthFt * SCALE_PERCENT_PER_FT;
-    item.x = clampNumber(item.x, 0, Math.max(0, 100 - widthPct), 0);
-    item.y = clampNumber(item.y, 0, Math.max(0, 100 - heightPct), 0);
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const { widthPct, heightPct } = itemSize(item);
+      item.x = clampNumber(item.x, 0, Math.max(0, 100 - widthPct), 0);
+      item.y = clampNumber(item.y, 0, Math.max(0, 100 - heightPct), 0);
+    }
   }
 
   function deleteSelected() {
@@ -592,8 +639,7 @@
       return 0;
     });
     return candidates.find((item) => {
-      const widthPct = item.widthFt * SCALE_PERCENT_PER_FT;
-      const heightPct = item.depthFt * SCALE_PERCENT_PER_FT;
+      const { widthPct, heightPct } = itemSize(item);
       const centerX = item.x + widthPct / 2;
       const centerY = item.y + heightPct / 2;
       const radians = item.rotation * Math.PI / 180;
@@ -796,8 +842,7 @@
     const item = state.items.find((candidate) => candidate.id === state.drag.id);
     if (!item) return;
     const point = stagePoint(event);
-    const widthPct = item.widthFt * SCALE_PERCENT_PER_FT;
-    const heightPct = item.depthFt * SCALE_PERCENT_PER_FT;
+    const { widthPct, heightPct } = itemSize(item);
     item.x = clampNumber(state.drag.origin.x + point.x - state.drag.start.x, 0, 100 - widthPct, item.x);
     item.y = clampNumber(state.drag.origin.y + point.y - state.drag.start.y, 0, 100 - heightPct, item.y);
     renderMap();
@@ -825,11 +870,13 @@
       clearDrawPreview();
       state.draw = null;
       if (widthPct >= 2 && heightPct >= 2) {
+        const centerX = left + widthPct / 2;
+        const centerY = top + heightPct / 2;
         addItem("blank", {
           x: left,
           y: top,
-          widthFt: roundHalf(widthPct / SCALE_PERCENT_PER_FT),
-          depthFt: roundHalf(heightPct / SCALE_PERCENT_PER_FT)
+          widthFt: roundHalf(widthPct / interpolate(SITE_SCALE.topWidthPercentPerFoot, SITE_SCALE.bottomWidthPercentPerFoot, centerY)),
+          depthFt: roundHalf(heightPct / interpolate(SITE_SCALE.leftDepthPercentPerFoot, SITE_SCALE.rightDepthPercentPerFoot, centerX))
         });
       } else {
         showToast("Drag a larger rectangle to place an item.");
@@ -884,9 +931,13 @@
     const directions = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
     if (!directions[event.key]) return;
     const [x, y] = directions[event.key];
-    const step = event.shiftKey ? 5 * SCALE_PERCENT_PER_FT : SCALE_PERCENT_PER_FT;
-    item.x += x * step;
-    item.y += y * step;
+    const { widthPct, heightPct } = itemSize(item);
+    const centerX = item.x + widthPct / 2;
+    const centerY = item.y + heightPct / 2;
+    const xStep = (event.shiftKey ? 5 : 1) * interpolate(SITE_SCALE.topWidthPercentPerFoot, SITE_SCALE.bottomWidthPercentPerFoot, centerY);
+    const yStep = (event.shiftKey ? 5 : 1) * interpolate(SITE_SCALE.leftDepthPercentPerFoot, SITE_SCALE.rightDepthPercentPerFoot, centerX);
+    item.x += x * xStep;
+    item.y += y * yStep;
     keepInBounds(item);
     renderMap();
     persist();

@@ -4,7 +4,7 @@ const PLAN_KEY = process.env.PLAN_KV_KEY || "zach-zoey:halloween-yard-plan";
 const GITHUB_REPO = process.env.PLAN_GITHUB_REPO || "buddytohelpu/zach-zoey-halloween-planner";
 const GITHUB_PATH = process.env.PLAN_GITHUB_PATH || ".data/plan.json";
 const GITHUB_BRANCH = process.env.PLAN_GITHUB_BRANCH || "plan-data";
-const FRONTAGE_FT = 95;
+const MAX_DIMENSION_FT = 113;
 const COLORS = new Set(["coral", "yellow", "teal", "plum", "blue"]);
 
 function storageConfig() {
@@ -80,8 +80,8 @@ function number(value, minimum, maximum, fallback) {
 }
 
 function cleanItem(raw, index) {
-  const widthFt = number(raw.widthFt, 1, FRONTAGE_FT, 10);
-  const depthFt = number(raw.depthFt, 1, FRONTAGE_FT, 10);
+  const widthFt = number(raw.widthFt, 1, MAX_DIMENSION_FT, 10);
+  const depthFt = number(raw.depthFt, 1, MAX_DIMENSION_FT, 10);
   return {
     id: String(raw.id || `item-${index}`).slice(0, 100),
     name: String(raw.name || "New setup").slice(0, 40),
